@@ -48,7 +48,7 @@ def validate_book(book_id):
         abort(make_response({"message":f"book {book_id} not found"}, 404))
     return book
 
-@books_bp.route("", methods=['GET'])
+@books_bp.route("/<book_id>", methods=['GET'])
 def read_one_book(book_id):
     '''
     GET method - allows user to query one book's record from book table
@@ -60,6 +60,22 @@ def read_one_book(book_id):
         'title': book.title,
         'description': book.description
     }
+
+@books_bp.route("/<book_id>", methods=['PUT'])
+def update_book(book_id):
+    '''
+    PUT method - update book parameter
+    '''
+    book = validate_book(book_id)
+
+    request_body = request.get_json()
+
+    book.title = request_body["title"]
+    book.description = request_body["description"]
+
+    db.session.commit()
+
+    return make_response(f"Book #{book.id} successfully updated.")
 
 
 
