@@ -1,10 +1,14 @@
 from app import db
 from app.models.book import Book
-from flask import Blueprint, jsonify, make_response, request
+from flask import abort, Blueprint, jsonify, make_response, request
 
 books_bp = Blueprint("books", __name__, url_prefix="/books")
 @books_bp.route("", methods=["POST"])
 def create_book():
+    '''
+    POST method - allows user to add a book and its corresponding parameters
+    to the book's record
+    '''
     request_body = request.get_json()
     new_book = Book(title=request_body["title"],
                     description=request_body["description"])
@@ -16,6 +20,9 @@ def create_book():
 
 @books_bp.route("", methods=["GET"])
 def read_all_books():
+    '''
+    GET method - allows user to query all book records from book table
+    '''
     books = Book.query.all()
     books_response = []
     for book in books:
@@ -26,6 +33,33 @@ def read_all_books():
         })
     return jsonify(books_response)
 
+def validate_book(book_id):
+    '''
+    helper function - throws an error with http code for invalid book IDs
+    '''
+    try:
+        book_id = int(book_id)
+    except:
+        abort(make_response({"message":f"book {book_id} invalid"}, 400))
+    
+    book = Book.query.get(book_id)
+    
+    if not book:
+        abort(make_response({"message":f"book {book_id} not found"}, 404))
+    return book
+
+@books_bp.route("", methods=['GET'])
+def read_one_book(book_id):
+    '''
+    GET method - allows user to query one book's record from book table
+    '''
+    book = validate_book(book_id)
+
+    return {
+        'id': book.id,
+        'title': book.title,
+        'description': book.description
+    }
 
 
 
@@ -97,15 +131,3 @@ def read_all_books():
 #         "title": book.title,
 #         "description": book.description,
 #     }
-
-# def validate_book(book_id):
-#     try:
-#         book_id = int(book_id)
-#     except:
-#         abort(make_response({"message":f"book {book_id} invalid"}, 400))
-    
-#     for book in books:
-#         if book.id == book_id:
-#             return book
-    
-#     abort(make_response({"message":f"book {book_id} not found"}, 404))
