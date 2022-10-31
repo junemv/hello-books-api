@@ -23,7 +23,12 @@ def read_all_books():
     '''
     GET method - allows user to query all book records from book table
     '''
-    books = Book.query.all()
+    title_query = request.args.get("title")
+    if title_query:
+        books = book.query.filter_by(title=title_query)
+    else:    
+        books = Book.query.all()
+    
     books_response = []
     for book in books:
         books_response.append({
