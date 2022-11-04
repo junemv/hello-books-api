@@ -33,19 +33,19 @@ def read_all_books():
         books_response.append(book.to_dict())
     return jsonify(books_response)
 
-def validate_book(book_id):
+def validate_model(cls, model_id):
     '''
     helper function - throws an error with http code for invalid book IDs
     '''
     try:
-        book_id = int(book_id)
+        model_id = int(model_id)
     except:
-        abort(make_response(jsonify({"message":f"book {book_id} invalid"}), 400))
+        abort(make_response(jsonify({"message":f"{cls.__name__} {model_id} invalid"}), 400))
     
-    book = Book.query.get(book_id)
+    book = cls.query.get(model_id)
     
     if not book:
-        abort(make_response(jsonify({"message":f"book {book_id} not found"}), 404))
+        abort(make_response(jsonify({"message":f"{cls.__name__} {model_id} not found"}), 404))
     return book
 
 @books_bp.route("/<book_id>", methods=['GET'])
@@ -53,7 +53,7 @@ def read_one_book(book_id):
     '''
     GET method - allows user to query one book's record from book table
     '''
-    book = validate_book(book_id)
+    book = validate_model(Book, book_id)
 
     return book.to_dict()
 
@@ -62,7 +62,7 @@ def update_book(book_id):
     '''
     PUT method - update book parameter
     '''
-    book = validate_book(book_id)
+    book = validate_model(Book, book_id)
 
     request_body = request.get_json()
 
@@ -71,16 +71,16 @@ def update_book(book_id):
 
     db.session.commit()
 
-    return make_response(jsonify(f"Book #{book.id} successfully updated."))
+    return make_response(jsonify(f"Book #{book.id} successfully updated"))
 
 @books_bp.route("/<book_id>", methods=['DELETE'])
 def delete_book(book_id):
-    book = validate_book(book_id)
+    book = validate_model(Book, book_id)
 
     db.session.delete(book)
     db.session.commit()
 
-    return make_response(jsonify(f"Book #{book.id} successfully deleted."))
+    return make_response(jsonify(f"Book #{book.id} successfully deleted"))
 
 
 
@@ -142,7 +142,7 @@ def delete_book(book_id):
 
 # @books_bp.route("/<book_id>", methods=["GET"])
 # def handle_book(book_id):
-#     book = validate_book(book_id)
+#     book = validate_model(book_id)
     
 #     return {
 #         "id": book.id,
