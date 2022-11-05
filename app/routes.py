@@ -1,8 +1,11 @@
 from app import db
 from app.models.book import Book
+from app.models.author import Author
 from flask import abort, Blueprint, jsonify, make_response, request
 
+## Book endpoints ##
 books_bp = Blueprint("books", __name__, url_prefix="/books")
+
 @books_bp.route("", methods=["POST"])
 def create_book():
     '''
@@ -16,6 +19,7 @@ def create_book():
     db.session.commit()
 
     return make_response(jsonify(f"Book {new_book.title} successfully created"), 201)
+
 
 @books_bp.route("", methods=["GET"])
 def read_all_books():
@@ -33,6 +37,7 @@ def read_all_books():
         books_response.append(book.to_dict())
     return jsonify(books_response)
 
+
 def validate_model(cls, model_id):
     '''
     helper function - throws an error with http code for invalid book IDs
@@ -48,6 +53,7 @@ def validate_model(cls, model_id):
         abort(make_response(jsonify({"message":f"{cls.__name__} {model_id} not found"}), 404))
     return book
 
+
 @books_bp.route("/<book_id>", methods=['GET'])
 def read_one_book(book_id):
     '''
@@ -56,6 +62,7 @@ def read_one_book(book_id):
     book = validate_model(Book, book_id)
 
     return book.to_dict()
+
 
 @books_bp.route("/<book_id>", methods=['PUT'])
 def update_book(book_id):
@@ -73,6 +80,7 @@ def update_book(book_id):
 
     return make_response(jsonify(f"Book #{book.id} successfully updated"))
 
+
 @books_bp.route("/<book_id>", methods=['DELETE'])
 def delete_book(book_id):
     book = validate_model(Book, book_id)
@@ -81,6 +89,40 @@ def delete_book(book_id):
     db.session.commit()
 
     return make_response(jsonify(f"Book #{book.id} successfully deleted"))
+
+
+## Author endpoints ##
+authors_bp = Blueprint("authors", __name__, url_prefix="/authors")
+
+authors_bp.route("", methods=["POST"])
+def create_author():
+    '''
+    POST method - add one author record to table
+    '''
+    request_body = request.get_json()
+    new_author = Author(name=request_body["name"],)
+
+    db.session.add(new_author)
+    db.session.commit()
+
+    return make_response(jsonify(f"Author {new_author.name} successfully created"), 201)
+
+
+@authors_bp.route("", methods=["GET"])
+def read_all_authors():
+    
+    authors = Author.query.all()
+
+    authors_response = []
+    for author in authors:
+        authors_response.append({
+                "name": author.name
+            })
+
+    return jsonify(authors_response)
+
+
+
 
 
 
