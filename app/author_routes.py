@@ -8,7 +8,7 @@ from flask import abort, Blueprint, jsonify, make_response, request
 ## Author endpoints ##
 authors_bp = Blueprint("authors", __name__, url_prefix="/authors")
 
-authors_bp.route("", methods=["POST"])
+@authors_bp.route("", methods=["POST"])
 def create_author():
     '''
     POST method - add one author record to table

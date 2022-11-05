@@ -5,5 +5,8 @@ class Author(db.Model):
     name = db.Column(db.String)
     books = db.relationship("Book", back_populates="author")
 
+    def to_dict():
+        pass
+    
     def from_dict():
         pass
