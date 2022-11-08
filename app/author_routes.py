@@ -5,8 +5,6 @@ from app.routes import validate_model
 from flask import abort, Blueprint, jsonify, make_response, request
 
 
-
-## Author endpoints ##
 authors_bp = Blueprint("authors", __name__, url_prefix="/authors")
 
 @authors_bp.route("", methods=["POST"])
