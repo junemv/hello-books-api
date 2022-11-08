@@ -25,6 +25,7 @@ def create_book():
 def read_all_books():
     '''
     GET method - allows user to query all book records from book table
+    allows user to query all book records by title
     '''
     title_query = request.args.get("title")
     if title_query:
@@ -89,38 +90,6 @@ def delete_book(book_id):
     db.session.commit()
 
     return make_response(jsonify(f"Book #{book.id} successfully deleted"))
-
-
-## Author endpoints ##
-authors_bp = Blueprint("authors", __name__, url_prefix="/authors")
-
-authors_bp.route("", methods=["POST"])
-def create_author():
-    '''
-    POST method - add one author record to table
-    '''
-    request_body = request.get_json()
-    new_author = Author(name=request_body["name"],)
-
-    db.session.add(new_author)
-    db.session.commit()
-
-    return make_response(jsonify(f"Author {new_author.name} successfully created"), 201)
-
-
-@authors_bp.route("", methods=["GET"])
-def read_all_authors():
-    
-    authors = Author.query.all()
-
-    authors_response = []
-    for author in authors:
-        authors_response.append({
-                "name": author.name
-            })
-
-    return jsonify(authors_response)
-
 
 
 
